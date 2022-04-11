@@ -24,24 +24,45 @@ function init() {
   })
 }
 
-function step(b: Branch) {
+const pendingTasks: Function[] = []
+
+function step(b: Branch, depth = 0) {
   const end = getEndPoint(b)
   drawBranch(b)
-  if (Math.random() < 0.5) {
-    step({
-      start: end,
-      length: 100,
-      theta: b.theta - 0.1,
-    })
+  if (depth < 4 || Math.random() < 0.5) {
+    pendingTasks.push(() =>
+      step({
+        start: end,
+        length: b.length + (Math.random() * 10 - 5),
+        theta: b.theta - 0.3 * Math.random(),
+      }, depth + 1))
   }
-  if (Math.random() < 0.5) {
-    step({
-      start: end,
-      length: 100,
-      theta: b.theta + 0.1,
-    })
+  if (depth < 4 || Math.random() < 0.5) {
+    pendingTasks.push(() =>
+      step({
+        start: end,
+        length: b.length + (Math.random() * 10 - 5),
+        theta: b.theta + 0.3 * Math.random(),
+      }, depth + 1))
   }
 }
+
+function frame() {
+  const tasks = [...pendingTasks]
+  pendingTasks.length = 0
+  tasks.forEach(fn => fn())
+}
+let framesCount = 0
+function startFrame() {
+  requestAnimationFrame(() => {
+    framesCount += 1
+    if (framesCount % 3 === 0)
+      frame()
+    startFrame()
+  })
+}
+
+startFrame()
 
 function lineTo(p1: Point, p2: Point) {
   ctx.beginPath()
