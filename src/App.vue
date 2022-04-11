@@ -17,26 +17,30 @@ interface Branch {
 
 function init() {
   ctx.strokeStyle = '#fff'
-  const branch = {
+  step({
     start: { x: WIDTH / 2, y: HEIGHT },
-    length: 100,
+    length: 40,
     theta: -Math.PI / 2,
-  }
-  const end = getEndPoint(branch)
-  drawBranch(branch)
+  })
+}
 
-  const leftBranch = {
-    start: end,
-    length: 100,
-    theta: branch.theta - 0.1,
+function step(b: Branch) {
+  const end = getEndPoint(b)
+  drawBranch(b)
+  if (Math.random() < 0.5) {
+    step({
+      start: end,
+      length: 100,
+      theta: b.theta - 0.1,
+    })
   }
-  drawBranch(leftBranch)
-  const rightBranch = {
-    start: end,
-    length: 100,
-    theta: branch.theta + 0.1,
+  if (Math.random() < 0.5) {
+    step({
+      start: end,
+      length: 100,
+      theta: b.theta + 0.1,
+    })
   }
-  drawBranch(rightBranch)
 }
 
 function lineTo(p1: Point, p2: Point) {
